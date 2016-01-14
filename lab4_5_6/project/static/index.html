@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html ng-app="app">
+<head>
+    <title>Mail--</title>
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.4.7/angular.min.js"></script>
+    <script type="text/javascript">
+        var app = angular.module('app', []);
+//        app.config(function ($interpolateProvider) {
+//            $interpolateProvider.startSymbol('{{');
+//            $interpolateProvider.endSymbol('}}');
+//        });
+        app.controller('MainCtrl', function ($scope, mailService) {
+            $scope.model = {};
+            $scope.id = 0;
+            $scope.saved = "";
+            $scope.save = function () {
+                console.log($scope.model);
+                mailService.save($scope.model)
+                        .then(
+                                function (data) {
+                                    console.log("success save!")
+                                }
+                        );
+            }
+            $scope.get = function (id) {
+                console.log("getting " + id);
+                mailService.get(id)
+                        .then(
+                                function (data) {
+                                    $scope.model = data;
+                                }
+                        );
+                $scope.id = id;
+            }
+            $scope.get(0);
+        });
+
+
+        app.service(
+                "mailService",
+                function ($http, $q) {
+                    return ({
+                        get: get,
+                        save: save
+                    });
+
+                    function get(id) {
+                        var request = $http({
+                            method: "get",
+                            url: "mail.get",
+                            params: {
+                                'offset': id
+                            }
+                        });
+                        return ( request.then(handleSuccess, handleError) );
+                    }
+
+                    function save(data) {
+                        var request = $http({
+                            method: "get",
+                            url: "mail.save",
+                            params: {
+                                'data': data
+                            }
+                        });
+                        return ( request.then(handleSuccess, handleError) );
+                    }
+
+                    function handleError(response) {
+                        if (
+                                !angular.isObject(response.data) || !response.data.message
+                        ) {
+                            return ( $q.reject("An unknown error occurred.") );
+                        }
+                        return ( $q.reject(response.data.message) );
+                    }
+
+                    function handleSuccess(response) {
+                        return ( response.data );
+                    }
+
+                }
+        );
+    </script>
+</head>
+<body>
+<div ng-controller="MainCtrl">
+    <div ng-repeat="(k,v) in model">
+        <label ng-attr-for="{{ k }}">{{ k }}</label>
+        <input ng-attr-id="{{ k }}" type="text" ng-model="model[k]"/>
+    </div>
+    <div>
+        <input type="button" value="<<" ng-click="get(key-1)"/>
+        <input type="button" value="save" ng-click="save()"/>
+        <input type="button" value=">>" ng-click="get(key+1)"/>
+    </div>
+</div>
+</body>
+</html>
