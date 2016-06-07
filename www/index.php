@@ -21,8 +21,8 @@ $registry->set ('template', $template);
 
 $router = new Router($registry);	//создание маршрутизатора
 $registry->set ('router', $router);
-$router->setPath (site_path . 'controllers');	//директортория в которой храняться контроллеры
-$router->delegate();
+$router->setPath (site_path . 'controllers');	// вызов функции setPath
+$router->delegate();	// вызов функции delegate
 
 function delegate() {
         // Анализируем путь
